@@ -2,7 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const startGameBtn = document.getElementById('start-game-btn');
     const selectCategoryBtn = document.getElementById('select-category-btn');
     const nextQuestionBtn = document.getElementById('next-question-btn');
+    const endGameBtn = document.getElementById('end-game-btn');
     const playAgainBtn = document.getElementById('play-again-btn');
+    const selectAnotherCategoryBtn = document.getElementById('select-another-category-btn');
+
 
     let gameId;
     let gamePlayers;
@@ -14,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     startGameBtn.addEventListener('click', startGame);
     selectCategoryBtn.addEventListener('click', selectCategory);
     nextQuestionBtn.addEventListener('click', getNextQuestion);
+    selectAnotherCategoryBtn.addEventListener('click', selectAnotherCategory);
+    endGameBtn.addEventListener('click', endGame);
     playAgainBtn.addEventListener('click', () => location.reload());
 
     function startGame() {
@@ -23,6 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (player1Name || player2Name) {
             document.getElementById('player-setup').classList.add('hidden');
             document.getElementById('category-selection').classList.remove('hidden');
+            document.getElementById('select-category-btn').classList.remove('hidden');
+
         }
         else {
             alert('Please enter both player names.');
@@ -100,7 +107,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentPlayerIndex === 0) {
             if (currentDifficulty === 'easy') currentDifficulty = 'medium';
             else if (currentDifficulty === 'medium') currentDifficulty = 'hard';
-            else if (currentDifficulty === 'hard') endGame();
+            else if (currentDifficulty === 'hard') selectAnotherCategory()
+
         }
 
         nextQuestionBtn.classList.remove('hidden');
@@ -137,8 +145,57 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json())
             .then(data => {
                 document.getElementById('game-play').classList.add('hidden');
+                document.getElementById('category-selection').classList.add('hidden');
                 document.getElementById('game-end').classList.remove('hidden');
                 document.getElementById('winner-text').textContent = `Congratulations, ${data.winner.name}! You won with ${data.winner.score} points.`;
             });
     }
+
+    function selectAnotherCategory() {
+
+        document.getElementById('game-play').classList.add('hidden');
+        document.getElementById('category-selection').classList.remove('hidden');
+        document.getElementById('select-category-btn').classList.add('hidden');
+        document.getElementById('or-option').classList.remove('hidden');
+        document.getElementById('select-another-category-btn').classList.remove('hidden');
+        document.getElementById('end-game-btn').classList.remove('hidden');
+
+        const category = document.getElementById('category').value;
+        const err = document.getElementById('err-msg');
+
+        fetch('http://localhost:5000/api/game/another-category', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                category: category,
+                gameId: gameId,
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                if (data.message === 'No more categories available') {
+                    endGame();
+                }
+                else if (data.message === "Another category selected.") {
+                    currentDifficulty = 'easy'
+
+                    document.getElementById('category-selection').classList.add('hidden');
+                    document.getElementById('game-play').classList.remove('hidden');
+                    getNextQuestion();
+
+                }
+                else if (!err.value) {
+                    err.textContent = " This category has  already been chosen."
+                    err.style.color = "red";
+
+                }
+
+            });
+
+    }
+
+
 });

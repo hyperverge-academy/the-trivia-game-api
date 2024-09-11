@@ -2,8 +2,10 @@ const Player = require('../models/playerModel');
 const Game = require('../models/gameModel');
 const { fetchQuestions } = require('./questionController');
 
+let chosenCategories
 
 const startGame = async (req, res) => {
+    chosenCategories = [];
     const { player1Name, player2Name, category } = req.body
 
     const player1 = await Player.create({ name: player1Name });
@@ -13,6 +15,8 @@ const startGame = async (req, res) => {
         players: [player1._id, player2._id],
         category: category,
     })
+
+    chosenCategories.push(category);
 
     res.json({ game, player1, player2 });
 }
@@ -50,6 +54,32 @@ const updateScore = async (req, res) => {
 
 }
 
+const getAnotherCategory = async (req, res) => {
+    const {category, gameId} = req.body;
+
+    if(chosenCategories.length == 8){
+        return res.status(400).json({ message: 'No more categories available' });
+    }
+    else if (chosenCategories.includes(category)) {
+       
+        return res.status(400).json({ message: 'Category already chosen' });
+    }
+    else{
+        const game = await Game.findById(gameId);
+        if (!game) {
+            return res.status(404).json({ message: 'Game not found' });
+        }
+        
+        game.category = category;
+        await game.save();
+        chosenCategories.push(category);
+
+        return res.json({message: 'Another category selected.'})
+    }
+
+
+}
+
 
 const endGame = async (req, res) => {
     const { gameId } = req.body;
@@ -67,4 +97,4 @@ const endGame = async (req, res) => {
 }
 
 
-module.exports = { startGame, getNextQuestion, updateScore, endGame };
+module.exports = { startGame, getNextQuestion, updateScore, getAnotherCategory, endGame };
