@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Trivia Game</h1>
+        
+        <div id="player-setup" class="setup">
+            <h2>Enter Player Names</h2>
+            <input type="text" id="player1Name" placeholder="Player 1 Name">
+            <input type="text" id="player2Name" placeholder="Player 2 Name">
+            <button id="start-game-btn">Start Game</button>
+        </div>
+        
+        <div id="category-selection" class="setup hidden">
+            <h2>Select Category</h2>
+            <select id="category">
+                <option value="science">Science</option>
+                <option value="history">History</option>
+                <option value="geography">Geography</option>
+                <option value="music">Music</option>
+                <option value="film_and_tv">Film and tv</option>
+                <option value="arts_and_literature">Arts and literature</option>
+                <option value="food_and_drink">Food and drink</option>
+                <option value="society_and_culture">Society and culture</option>
+            </select>
+            <button id="select-category-btn">Select Category</button>
+        </div>
+        
+        <div id="game-play" class="hidden">
+            <h2 id="current-player-name"></h2>
+            <h3 id="question-text"></h3>
+            <ul id="answers-list"></ul>
+            <button id="next-question-btn" class="hidden">Next Question</button>
+        </div>
+        
+        <div id="game-end" class="hidden">
+            <h2>Game Over</h2>
+            <p id="winner-text"></p>
+            <button id="play-again-btn">Play Again</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    
+</body>
+</html>
